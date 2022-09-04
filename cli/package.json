@@ -1,7 +1,7 @@
 {
   "name": "ss-deploy-cli",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "lib/index.js",
   "license": "MIT",
   "dependencies": {
     "superagent": "^8.0.0",
