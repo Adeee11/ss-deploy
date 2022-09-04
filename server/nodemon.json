@@ -1,0 +1,17 @@
+{
+    "ignore": [
+        ".git",
+        "node_modules"
+    ],
+    "execMap": {
+        "js": "node --harmony"
+    },
+    "events": {
+        "restart": "echo \"restarted\""
+    },
+    "exec": "ts-node -r tsconfig-paths/register --project ./tsconfig.json src/index.ts",
+    "watch": [
+        "src"
+    ],
+    "ext": "js,json,ts,graphql"
+}

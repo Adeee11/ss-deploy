@@ -1,0 +1,21 @@
+{
+  "name": "ss-deploy-cli",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "superagent": "^8.0.0",
+    "yargs": "^17.5.1"
+  },
+  "scripts": {
+    "build": "tsc --project ./tsconfig.build.json"
+  },
+  "bin": {
+    "ss-deploy-cli": "./lib/index.js"
+  },
+  "devDependencies": {
+    "typescript": "^4.9.0-dev.20220904",
+    "@types/superagent": "^4.1.15",
+    "@types/yargs": "^17.0.12"
+  }
+}
