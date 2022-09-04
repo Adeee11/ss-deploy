@@ -1,3 +1,4 @@
+version: '3.3'
 services:
   traefik-server:
     image: "traefik:2.8.4" 
@@ -7,43 +8,61 @@ services:
         - "--providers.docker=true"
         - "--providers.docker.exposedbydefault=false"
         - "--providers.docker.swarmMode=true"
-        - "--certificatesresolvers.myresolver.acme.dnschallenge=true"
-        - "--certificatesresolvers.myresolver.acme.dnschallenge.provider=cloudflare"
+        # - "--certificatesresolvers.mytlschallenge.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+        - "--certificatesresolvers.mytlschallenge.acme.dnschallenge=true"
+        - "--certificatesresolvers.mytlschallenge.acme.dnschallenge.provider=cloudflare"
+        - "--certificatesresolvers.mytlschallenge.acme.email=<email>"
+        - "--certificatesresolvers.mytlschallenge.acme.storage=/letsencrypt/acme.json"
+        # - "--certificatesresolvers.mytlschallenge.acme.dnschallenge.resolvers=8.8.8.8"
         - "--entrypoints.web.address=:80"
         - "--entrypoints.websecure.address=:443"
-        - "--certificatesresolvers.mytlschallenge.acme.tlschallenge=true"
-        - "--certificatesresolvers.mytlschallenge.acme.email=adarsh.singh.legha@gmail.com"
-        - "--certificatesresolvers.mytlschallenge.acme.storage=/letsencrypt/acme.json"
+        # - "--certificatesresolvers.mytlschallenge.acme.tlschallenge=true"
+        - "--certificatesresolvers.mytlschallenge.acme.dnschallenge.delaybeforecheck=120"
+        - "--certificatesresolvers.mytlschallenge.acme.dnschallenge.disablepropagationcheck=true"
     ports:
       - "80:80"
       - "443:443"
       - "8080:8080"
     environment:
-      - CF_API_EMAIL=<cf-email>
-      - CF_API_KEY=<cf-api-key>
+      - CF_API_EMAIL=<CF-EMAil>
+      - CF_DNS_API_TOKEN=<CF-Token>
     networks: 
       - traefik-net
     volumes:
       - "./letsencrypt:/letsencrypt"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-
+  # whoami:
+  #   image: "traefik/whoami"
+  #   networks:
+  #     - traefik-net
+  #   deploy:
+  #     labels:
+  #       - "traefik.enable=true"
+  #       - "traefik.http.routers.whoami.rule=Host(`whoami.static-apps.jetvin.org`)"
+  #       - "traefik.http.routers.whoami.entrypoints=web"
+  #       - "traefik.http.services.whoami-svc.loadbalancer.server.port=80"
   ss-deploy-server:
-    image: adeee11/ss-deploy-server:latest
+    image: registry-sv.jetvin.org/ss-deploy-server:v1
     # build: 
     #   context: .
     #   dockerfile: Dockerfile
     environment:
       - PORT=8000
-      - HOST_NAME=<host-name>
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.ss-deploy-server.rule=Host(`api.host-name`)"
-      - "traefik.http.routers.ss-deploy-server.entrypoints=websecure"
-      - "traefik.http.routers.ss-deploy-server.tls.certresolver=mytlschallenge"
-      - "traefik.http.routers.ss-deploy-server.tls=true"
-      - "traefik.http.routers.ss-deploy-server.tls.domains[0].main=api.host-name"
-      - "traefik.http.routers.ss-deploy-server.tls.domains[0].sans=*.host-name"
-      - "traefik.http.services.ss-deploy-server-svc.loadbalancer.server.port=8000"
+      - HOST_NAME=<HOST-NAME>
+    deploy:
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.nodehttps.rule=HostRegexp(`<HOST-NAME>`, `{subdomain:[a-zA-Z0-9_]+}.<HOST-NAME>`)
+        - traefik.http.routers.nodehttp.rule=HostRegexp(`<HOST-NAME>`, `{subdomain:[a-zA-Z0-9_]+}.<HOST-NAME>`)
+        - traefik.http.routers.nodehttp.entrypoints=web
+        - traefik.http.routers.nodehttps.entrypoints=websecure
+        - traefik.http.routers.nodehttp.middlewares=nodehttpsredirect@docker
+        - traefik.http.routers.nodehttps.tls.certresolver=mytlschallenge
+        - "traefik.http.routers.nodehttps.tls.domains[0].main=<HOST-NAME>"
+        - "traefik.http.routers.nodehttps.tls.domains[0].sans=*.<HOST-NAME>"
+        - "traefik.http.services.node-service.loadbalancer.server.port=8000"
+        - traefik.http.middlewares.nodehttpsredirect.headers.sslredirect=true
+        - traefik.docker.network=traefik-net
     networks:
       - traefik-net
     volumes:
