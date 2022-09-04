@@ -4,7 +4,7 @@
   "description": "",
   "main": "build/index.js",
   "scripts": {
-    "start": "TS_NODE_BASEURL=./dist node -r tsconfig-paths/register 'dist/main.js'",
+    "start": "TS_NODE_BASEURL=./dist node -r tsconfig-paths/register 'dist/index.js'",
     "copy": "copy-and-watch src/**/*.graphql dist/",
     "copy:watch": "copy-and-watch --watch src/**/*.graphql dist/",
     "build": "tsc --project ./tsconfig.build.json && npm run copy",

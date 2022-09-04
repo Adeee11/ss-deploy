@@ -1,9 +1,9 @@
 
 import path from 'path';
-import { DOWNLOAD_DIR, HTML_DIR } from 'src/constants';
+import { DOWNLOAD_DIR, HTML_DIR } from 'constants-api';
 import unzipper from 'unzipper';
 import { createReadStream } from 'fs';
-import { IState } from 'src/apiRouter';
+import { IState } from 'apiRouter';
 import del from 'del';
 
 

@@ -1,7 +1,7 @@
 import { Router, static as expressStatic } from "express";
 import path from "path";
 import fs from "fs";
-import { HTML_DIR } from "./constants";
+import { HTML_DIR } from "./constants-api";
 import { apiRouter } from "./apiRouter";
 
 const vhostRouter = Router();
@@ -22,7 +22,7 @@ const existsDir = (dir: string) => {
 
 vhostRouter.use(async (req, res, next) => {
   const vhost = (req as any).vhost;
-  if (vhost.length !== 1) {
+  if (vhost.length == 0) {
     return res.sendStatus(404);
   }
   if (vhost[0] === "api") {
@@ -33,8 +33,8 @@ vhostRouter.use(async (req, res, next) => {
 
   if (await existsDir(directory)) {
     return expressStatic(directory)(req, res, next);
-  }else {
-    return res.status(404).json({msg: 'Not Found'})
+  } else {
+    return res.status(404).json({ msg: 'Not Found' })
   }
 });
 
